@@ -18,6 +18,7 @@ class CDCConnector
 {
 public:
     CDCConnector(CDCDEV variant);
+    CDCConnector();
     ~CDCConnector();
 
     int connect();

@@ -27,6 +27,21 @@ CDCConnector::CDCConnector(CDCDEV variant)
     m_husb = 0;
 }
 
+CDCConnector::CDCConnector()
+{
+    libusb_init(&m_ctx);
+    libusb_set_debug(m_ctx, 1); // уровень вывода ошибок libusb: warning [darwin_transfer_status] transfer error: timed out, https://libusb.sourceforge.io/api-1.0/group__libusb__lib.html#ga2d6144203f0fc6d373677f6e2e89d2d2
+    m_husb = 0;
+}
+
+/*!
+ * Переназначает вариант микросхемы
+ */
+void CDCConnector::resetVariant(CDCDEV variant)
+{
+    m_device = variant;
+}
+
 /*!
  * Деструктор класа. Выполняет отключение микросхемы и высвобождение ресурсов
  */
@@ -205,7 +220,7 @@ int CDCConnector::sendBytes(unsigned char *buf, int size)
     int error = 0, i = 0;
     if (size < 1)
         return -EINVAL;
-    if (size < 8)
+    if (size < 9)
         return libusb_bulk_transfer(m_husb, m_device.bulkWriteEndpoint, buf, size, &transferred, DEFAULT_TIMEOUT);
     else
     {
