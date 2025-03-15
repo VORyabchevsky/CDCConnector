@@ -4,7 +4,7 @@
 
 ## Релизы
 
-Актуальную версию собранной библиотеки можете скачать со [страницы релизов](https://github.com/VORyabchevsky/CDCConnector/releases/).
+Актуальную версию собранной библиотеки можете скачать со страницы релизов [github](https://github.com/VORyabchevsky/CDCConnector/releases/) или [gitflic](https://gitflic.ru/project/voryabchevsky/cdcconnector/release).
 
 ## Сборка проекта
 
@@ -18,18 +18,21 @@
 Если все установлено, то скачиваем репозиторий и дополнительный файл заголовков libusb.h:
 
 ```
-git clone git@github.com:VORyabchevsky/experimental_1.git lib
+git clone https://gitflic.ru/project/voryabchevsky/cdcconnector.git lib
 curl -O curl -o lib/libusb.h https://raw.githubusercontent.com/tenderlove/libusb/refs/heads/master/libusb/libusb.h
 ```
 
-Для сборки всего проекта достаточно ввести: `make all`. В папке `build` автоматически создастся динамическая библиотека и файл `example` для текущей ОС.
+Для сборки всего проекта достаточно ввести: `make all`. В папке `build` автоматически создастся библиотеки и файл `example` для текущей ОС.
 
 Для получения документации необходимо вызвать `doxygen Doxyfile` или `make docs`. Читаемый файл будет находиться по пути `doc/html/index.html`
 
-Если необходимо создать только файл динамической библиотеки, достаточно вызвать `make libcdcc.so`. Для АврораОС использовал команды:
+- `make libcdcc.so` - создает файл динамической библиотеки
+- `make libcdcc.a` - создает файл статической библиотеки
+
+. Для АврораОС использовал команды:
 
 ```
-export $AURORA_TAG=AuroraOS-5.0.0.60-base-armv7hl.default
+export $AURORA_TAG=AuroraOS-5.1.3.85-MB2-aarch64.default
 sfdk engine exec sb2 -t $AURORA_TAG make libcdcc.so
 ```
 
@@ -40,13 +43,20 @@ _примечание: sfdk добавлено в PATH. AURORA_TAG указат�
 Текущая версия - минимальный прототип для обмена сообщениями. В планах:
 
 - [ ] функции для работы с сигналами rts, dtr и др.
-- [ ] qt класс для работы
-- [ ] добавить пример для aurora sdk
 - [ ] проверить и докрутить работу с другими микросхемами (cp210x, ft232)
 
 ## Примеры
 
-В папке examples сохранены примеры работы с библиотекой:
+- [EasyCOM](https://gitflic.ru/project/voryabchevsky/easycom)
+- examples/console_example.cpp - пример отправки сообщения "Hello world" и вывода всех входящих пакетов данных;
+- examples/echo/echo.ino - загрузите в любую плату \*duino _(с конвертором ch340 или pl2303)_ этот пример для отправки эхом всех сообщений от console_example.cpp;
+- examples/qt_class - пример вызова библиотеки в Qt.
 
-- console_example.cpp - пример отправки сообщения "Hello world" и вывода всех входящих пакетов данных;
-- echo.ino - загрузите в любую плату \*duino _(с конвертором ch340 или pl2303)_ этот пример для отправки эхом всех сообщений от console_example.cpp.
+## CHANGELOG
+
+### 1.1 (15/03/2025)
+
+- добавлена функция изменения сокрости обмена;
+- добавлена и проверена сборка статической библиотеки
+- добавлен пример для Qt;
+- мелкие исправления.

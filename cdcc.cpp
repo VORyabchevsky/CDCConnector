@@ -23,14 +23,14 @@ CDCConnector::CDCConnector(CDCDEV variant)
 {
     m_device = variant;
     libusb_init(&m_ctx);
-    libusb_set_debug(m_ctx, 1); // уровень вывода ошибок libusb: warning [darwin_transfer_status] transfer error: timed out, https://libusb.sourceforge.io/api-1.0/group__libusb__lib.html#ga2d6144203f0fc6d373677f6e2e89d2d2
+    libusb_set_option(m_ctx, LIBUSB_OPTION_LOG_LEVEL, 1); // уровень вывода ошибок libusb: warning [darwin_transfer_status] transfer error: timed out, https://libusb.sourceforge.io/api-1.0/group__libusb__lib.html#ga2d6144203f0fc6d373677f6e2e89d2d2
     m_husb = 0;
 }
 
 CDCConnector::CDCConnector()
 {
     libusb_init(&m_ctx);
-    libusb_set_debug(m_ctx, 1); // уровень вывода ошибок libusb: warning [darwin_transfer_status] transfer error: timed out, https://libusb.sourceforge.io/api-1.0/group__libusb__lib.html#ga2d6144203f0fc6d373677f6e2e89d2d2
+    libusb_set_option(m_ctx, LIBUSB_OPTION_LOG_LEVEL, 1); // уровень вывода ошибок libusb: warning [darwin_transfer_status] transfer error: timed out, https://libusb.sourceforge.io/api-1.0/group__libusb__lib.html#ga2d6144203f0fc6d373677f6e2e89d2d2
     m_husb = 0;
 }
 
@@ -124,6 +124,32 @@ int CDCConnector::setBaudrateToCH()
 void CDCConnector::setBaudrate(uint32_t baud)
 {
     m_baudrate = baud;
+}
+
+/*!
+ * Функция применения скорости работы интерфейса
+ *
+ * \result возвращает код ошибки (для libusb_error_name()) или 0 в случае успешного выполнения
+ */
+int CDCConnector::applyBaudrate()
+{
+    int error = 0;
+    if (m_husb != 0)
+    {
+        libusb_release_interface(m_husb, 0);
+
+        if (m_device.setupVarian == 0)
+        { // Profilic, SiliconLabs (CP), FT232
+            return setBaudrateToPL();
+        }
+        else if (m_device.setupVarian == 1)
+        { // CH34x
+            return setBaudrateToCH();
+        }
+
+        return error;
+    }
+    return 0;
 }
 
 /*!
@@ -267,8 +293,12 @@ int CDCConnector::lsUSB(std::vector<CDCDEV> *dev_list)
         rc = libusb_get_device_descriptor(device, &desc);
 
         if (rc != 0)
-            continue; // skip if error
-        (*dev_list).push_back({.vid = desc.idVendor, .pid = desc.idProduct, "found dev"});
+            continue;
+        // Костыль для Аврора SDK <5:
+        CDCDEV found_dev;
+        found_dev.vid = desc.idVendor;
+        found_dev.pid = desc.idProduct;
+        (*dev_list).push_back(found_dev);
     }
 
     libusb_free_device_list(list, 1);

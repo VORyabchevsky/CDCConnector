@@ -19,5 +19,5 @@ struct CDCDEV
 };
 
 inline CDCDEV cdcVariants[2] = {
-    {.vid = 0x1a86, .pid = 0x7523, .devName = "CH340", .desc = "Generic CH34x device", .bulkReadEndpoint = 0x82, .bulkWriteEndpoint = 0x02, .setupVarian = 1},
-    {.vid = 0x067b, .pid = 0x2303, .devName = "PL2303", .desc = "Prolific Technology, Inc. USB-Serial Controller", .bulkReadEndpoint = 0x83, .bulkWriteEndpoint = 0x02}};
+    {0x1a86, 0x7523, "CH340", "Generic CH34x device", 0x82, 0x02, 1},
+    {0x067b, 0x2303, "PL2303", "Prolific Technology, Inc. USB-Serial Controller", 0x83, 0x02}};

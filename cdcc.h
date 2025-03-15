@@ -1,7 +1,7 @@
 #ifndef CDCC
 #define CDCC
 #include <iostream>
-
+#include <vector>
 #include "variants.h"
 #include "libusb.h"
 
@@ -21,9 +21,11 @@ public:
     CDCConnector();
     ~CDCConnector();
 
+    void resetVariant(CDCDEV variant);
     int connect();
     void disconnect();
     void setBaudrate(uint32_t baud);
+    int applyBaudrate();
 
     int readBytes(unsigned char *buf, int size); ///< Перегрузка для readBytes
     int readBytes(unsigned char *buf, int size, int timeout);
