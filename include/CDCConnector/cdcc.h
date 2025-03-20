@@ -3,7 +3,7 @@
 #include <iostream>
 #include <vector>
 #include "variants.h"
-#include "libusb.h"
+#include <../libusb/libusb.h>  // Внешняя библиотека libusb
 
 /*!
     \brief Класс для работы с USB CDC
@@ -21,15 +21,15 @@ public:
     CDCConnector();
     ~CDCConnector();
 
-    void resetVariant(CDCDEV variant);
-    int connect();
-    void disconnect();
-    void setBaudrate(uint32_t baud);
-    int applyBaudrate();
+    virtual void resetVariant(CDCDEV variant);
+    virtual int connect();
+    virtual void disconnect();
+    virtual void setBaudrate(uint32_t baud);
+    virtual int applyBaudrate();
 
-    int readBytes(unsigned char *buf, int size); ///< Перегрузка для readBytes
-    int readBytes(unsigned char *buf, int size, int timeout);
-    int sendBytes(unsigned char *buf, int size);
+    virtual int readBytes(unsigned char *buf, int size); ///< Перегрузка для readBytes
+    virtual int readBytes(unsigned char *buf, int size, int timeout);
+    virtual int sendBytes(unsigned char *buf, int size);
 
     static int lsUSB(std::vector<CDCDEV> *dev_list);
     static int lsCDC(std::vector<CDCDEV> *dev_list);

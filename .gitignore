@@ -3,6 +3,6 @@
 libcdcc.so
 libcdcc.a
 libusb-1.0.so
-libusb.h
+libusb
 build/
 docs

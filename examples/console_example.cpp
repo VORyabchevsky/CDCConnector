@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include "../cdcc.h"
+#include "CDCConnector/cdcc.h"
 
 int main()
 {

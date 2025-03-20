@@ -1,45 +1,57 @@
-CXX		  := g++
-CXX_FLAGS := -std=c++17 -Wall -fpic
+# Компилятор и флаги (main)
+CXX		 := g++
+CXX_FLAGS   := -std=c++17 -Wall -fpic
+INCLUDE	 := -Iinclude
+LIBUSB_LIB  := -lusb-1.0  # Флаг для линковки libusb
 
-BIN		:= build
-DOC		:= docs
-INCLUDE	:= include
-LIB		:= lib
-LIBNAME = cdcc
+# Директории
+BIN		 := build
+DOC		 := docs
+SRC		 := src
+LIB		 := lib
+LIBNAME	 := cdcc
 
-LIBRARIES	:=
-EXECUTABLE	:= console_example
+# Цели
+EXECUTABLE  := console_example
 
+# Все цели
+all: clean dirs $(BIN)/$(EXECUTABLE) #docs
 
-all: dirs $(BIN)/$(EXECUTABLE) docs
-
+# Создание необходимых директорий
 dirs:
-	-mkdir $(BIN)
-	-mkdir $(DOC)
+	mkdir -p $(BIN)
+	mkdir -p $(LIB)
 
+# Запуск примера
 run: clean all
 	clear
 	./$(BIN)/$(EXECUTABLE)
 
-$(BIN)/$(EXECUTABLE): examples/$(EXECUTABLE).cpp lib$(LIBNAME).so lib$(LIBNAME).a
-	$(CXX) $(CXX_FLAGS) examples/$(EXECUTABLE).cpp -o $(BIN)/$(EXECUTABLE) -lusb-1.0 -L$(BIN) -l$(LIBNAME)
-	
-(libname).o:
-	$(CXX) $(CXX_FLAGS) -c -Wall -Werror -fpic -o $(BIN)/$(LIBNAME).o cdcc.cpp
+# Сборка исполняемого файла
+$(BIN)/$(EXECUTABLE): examples/$(EXECUTABLE).cpp $(LIB)/lib$(LIBNAME).so $(LIB)/lib$(LIBNAME).a
+	$(CXX) $(CXX_FLAGS) $(INCLUDE) examples/$(EXECUTABLE).cpp -o $(BIN)/$(EXECUTABLE) $(LIBUSB_LIB) -L$(LIB) -l$(LIBNAME)
 
-lib$(LIBNAME).so:(libname).o
-	$(CXX) -shared -I. -lusb-1.0  -o $(BIN)/lib$(LIBNAME).so $(BIN)/$(LIBNAME).o
-	cp $(BIN)/lib$(LIBNAME).so .
+# Сборка объектного файла из исходного кода
+$(BIN)/$(LIBNAME).o: $(SRC)/cdcc.cpp
+	$(CXX) $(CXX_FLAGS) $(INCLUDE) -c -o $(BIN)/$(LIBNAME).o $(SRC)/$(LIBNAME).cpp
 
-lib$(LIBNAME).a:(libname).o
-	$(CXX) $(CXX_FLAGS) -c -o $(BIN)/$(LIBNAME).o cdcc.cpp
-	ar rcs $(BIN)/lib$(LIBNAME).a $(BIN)/$(LIBNAME).o
-	cp $(BIN)/lib$(LIBNAME).a .
+# Сборка динамической библиотеки (.so)
+$(LIB)/lib$(LIBNAME).so: $(BIN)/$(LIBNAME).o
+	$(CXX) -shared -o $(LIB)/lib$(LIBNAME).so $(BIN)/$(LIBNAME).o $(LIBUSB_LIB)
+	cp $(LIB)/lib$(LIBNAME).so .
 
+# Сборка статической библиотеки (.a)
+$(LIB)/lib$(LIBNAME).a: $(BIN)/$(LIBNAME).o
+	ar rcs $(LIB)/lib$(LIBNAME).a $(BIN)/$(LIBNAME).o
+	cp $(LIB)/lib$(LIBNAME).a .
+
+# Генерация документации
 doc:
 	doxygen Doxyfile
 
+# Очистка временных файлов
 clean:
-	-rm libcdcc.so
-	-rm $(BIN)/*
-	-rm -rf $(DOC)/*
+	rm -f $(BIN)/*.o
+	rm -f $(LIB)/lib$(LIBNAME).so $(LIB)/lib$(LIBNAME).a
+	rm -f lib$(LIBNAME).so lib$(LIBNAME).a
+	rm -rf $(DOC)/*
