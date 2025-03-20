@@ -15,11 +15,13 @@
 - libusb-1.0
 - doxygen (не обязательно)
 
-Если все установлено, то скачиваем репозиторий и дополнительный файл заголовков libusb.h:
+Если все установлено, то скачиваем репозиторий и дополнительно библиотеку с заголовками:
 
 ```
-git clone https://gitflic.ru/project/voryabchevsky/cdcconnector.git lib
-curl -O curl -o lib/libusb.h https://raw.githubusercontent.com/tenderlove/libusb/refs/heads/master/libusb/libusb.h
+git clone https://gitflic.ru/project/voryabchevsky/cdcconnector.git cdcc
+cd cdcc
+git clone https://github.com/libusb/libusb.git tmp
+mv tmp/libusb . && rm -rf tmp
 ```
 
 Для сборки всего проекта достаточно ввести: `make all`. В папке `build` автоматически создастся библиотеки и файл `example` для текущей ОС.

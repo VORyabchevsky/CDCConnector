@@ -1,24 +1,7 @@
 #include <iostream>
 #include <vector>
-#include "CDCConnector/cdcc.h"  // Заголовочный файл для класса CDCConnector
+#include "CDCConnector/cdcc.h"
 
-#define ACM_CTRL_DTR 0x01
-#define ACM_CTRL_RTS 0x02
-
-#define CTRL_IN (LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_ENDPOINT_IN)
-#define CTRL_OUT (LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_ENDPOINT_OUT)
-
-#define DEFAULT_TIMEOUT 100 ///< мС
-
-#define IS_ERROR      \
-    if (error < 0)    \
-    {                 \
-        return error; \
-    }
-
-/*!
- * Конструктор класса. На вход ожидает  CDCDEV с параметрами выбранной микросхемы
- */
 CDCConnector::CDCConnector(CDCDEV variant)
 {
     m_device = variant;
@@ -34,17 +17,11 @@ CDCConnector::CDCConnector()
     m_husb = 0;
 }
 
-/*!
- * Переназначает вариант микросхемы
- */
 void CDCConnector::resetVariant(CDCDEV variant)
 {
     m_device = variant;
 }
 
-/*!
- * Деструктор класа. Выполняет отключение микросхемы и высвобождение ресурсов
- */
 CDCConnector::~CDCConnector()
 {
     disconnect();
@@ -80,57 +57,12 @@ int CDCConnector::setBaudrateToPL()
     return 0;
 }
 
-/*!
- *  Конвертор скоростей из uint32 в значения регистров для CH340 (и подобных). Содержит магическое число CH341_BAUDBASE_FACTOR = 1532620800.
- *  Взято из https://android.googlesource.com/kernel/msm/+/android-msm-hammerhead-3.4-kk-r1/drivers/usb/serial/ch341.c
- *
- * \return 0 в случае успеха и -EINVAL если указанная скорость вне диапазона или код ошибки для libusb_error_name()
- */
-int CDCConnector::setBaudrateToCH()
-{
-    uint16_t reg_a, reg_b;
-    uint32_t factor;
-    int8_t divisor;
-    int error = 0;
-
-    factor = (1532620800 / m_baudrate);
-    divisor = 3;
-
-    while ((factor > 0xfff0) && divisor)
-    {
-        factor >>= 3;
-        divisor--;
-    }
-
-    if (factor > 0xfff0)
-        return -EINVAL;
-
-    factor = 0x10000 - factor;
-    reg_a = (factor & 0xff00) | divisor;
-    reg_b = factor & 0xff;
-
-    error = libusb_control_transfer(m_husb, CTRL_OUT, 0x9a, 0x1312, reg_a, NULL, 0, 1000);
-    if (error < 0)
-    {
-        error = libusb_control_transfer(m_husb, CTRL_OUT, 0x9a, 0x0f2c, reg_b, NULL, 0, 1000);
-    }
-
-    return error;
-}
-
-/*!
- * Функция для записи необходимй скорости. Применяется во время connect
- */
-void CDCConnector::setBaudrate(uint32_t baud)
+int CDCConnector::setBaudrate(uint32_t baud)
 {
     m_baudrate = baud;
+    return 0;
 }
 
-/*!
- * Функция применения скорости работы интерфейса
- *
- * \result возвращает код ошибки (для libusb_error_name()) или 0 в случае успешного выполнения
- */
 int CDCConnector::applyBaudrate()
 {
     int error = 0;
@@ -142,21 +74,11 @@ int CDCConnector::applyBaudrate()
         { // Profilic, SiliconLabs (CP), FT232
             return setBaudrateToPL();
         }
-        else if (m_device.setupVarian == 1)
-        { // CH34x
-            return setBaudrateToCH();
-        }
-
         return error;
     }
     return 0;
 }
 
-/*!
- * Функция подготовки микросхемы к работе. Выполняет открытие интерфейса, подготовку и передачу скорости UART (baudrate) для обмена данными
- *
- * \result возвращает код ошибки (для libusb_error_name()) или 0 в случае успешного выполнения
- */
 int CDCConnector::connect()
 {
     int error = 0;
@@ -178,19 +100,9 @@ int CDCConnector::connect()
         IS_ERROR;
         return setBaudrateToPL();
     }
-    else if (m_device.setupVarian == 1)
-    { // CH34x
-        error = libusb_control_transfer(m_husb, CTRL_OUT, 0xa1, 0x501f, 0xd90a, NULL, 0, 1000);
-        IS_ERROR;
-        return setBaudrateToCH();
-    }
-
     return error;
 }
 
-/*!
- *  Отключение и высвобождение интерфейса. Вызывается деструктором. Необходимо вызывать перед изменением скорости инерфейса или когда не используется.
- */
 void CDCConnector::disconnect()
 {
     if (m_husb != 0)
@@ -204,15 +116,6 @@ void CDCConnector::disconnect()
         m_husb = 0;
     }
 }
-
-/*!
- *  Чтение данных из последовательного интерфейса. Обращается за данными к bulkReadEndpoint
- *
- *  \param[in] buf массив для записи результата
- *  \param[in] size рколличество ожидаемых символов = азмер массива для данных
- *  \param[in] timeout мс, время ожидания данных от интерфейса. Если ничего не пришло за это вермя то вернет LIBUSB_ERROR_TIMEOUT
- *  \return код ошибки или колличество полученных данных
- */
 
 int CDCConnector::readBytes(unsigned char *buf, int size, int timeout = 100)
 {
@@ -232,13 +135,6 @@ int CDCConnector::readBytes(unsigned char *buf, int size)
     return readBytes(buf, size, DEFAULT_TIMEOUT);
 }
 
-/*!
- *  Отправка данных в последовательный интерфейс. Отправляет в bulkWriteEndpoint
- *
- *  \param[in] buf массив с сообщением
- *  \param[in] size размер сообщения
- *  \return код ошибки или 0 если все ок
- */
 int CDCConnector::sendBytes(unsigned char *buf, int size)
 {
     int transferred;
@@ -264,12 +160,6 @@ int CDCConnector::sendBytes(unsigned char *buf, int size)
     return error;
 }
 
-/*!
- *  Заполнение списока доступных USB устройств
- *
- * \param[in] dev_list ссылка на вектор для записи списка обнаруженных устройств
- * \return колличество найденых устройств или -1 если не удалось инициализировать работу
- */
 int CDCConnector::lsUSB(std::vector<CDCDEV> *dev_list)
 {
 
@@ -307,12 +197,6 @@ int CDCConnector::lsUSB(std::vector<CDCDEV> *dev_list)
     return (*dev_list).size();
 }
 
-/*!
- *  Заполнение списка доступных USB CDC устройств
- *
- * \param[in] dev_list ссылка на вектор для записи списка обнаруженных устройств
- * \return колличество найденых устройств или -1 если не удалось инициализировать работу
- */
 int CDCConnector::lsCDC(std::vector<CDCDEV> *dev_list)
 {
 
@@ -352,12 +236,6 @@ int CDCConnector::lsCDC(std::vector<CDCDEV> *dev_list)
     return (*dev_list).size();
 }
 
-/*!
- *  Заполнение списка доступных USB CDC устройств
- *
- * \param[in] first ссылка CDCDEV переменную для сохранения
- * \return 1 если найдено устройство, 0 если нету или код ошибки
- */
 int CDCConnector::firstCDC(CDCDEV *first)
 {
     std::vector<CDCDEV> list;

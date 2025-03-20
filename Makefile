@@ -1,18 +1,20 @@
 # Компилятор и флаги (main)
-CXX		 := g++
+CXX         := g++
 CXX_FLAGS   := -std=c++17 -Wall -fpic
-INCLUDE	 := -Iinclude
+INCLUDE	    := -Iinclude
 LIBUSB_LIB  := -lusb-1.0  # Флаг для линковки libusb
 
 # Директории
-BIN		 := build
-DOC		 := docs
-SRC		 := src
-LIB		 := lib
-LIBNAME	 := cdcc
+BIN		    := build
+DOC		    := docs
+SRC		    := src
+LIB		    := lib
+LIBNAME	    := cdcc
 
 # Цели
 EXECUTABLE  := console_example
+SRCS        := $(wildcard $(SRC)/*.cpp)
+OBJS        := $(patsubst $(SRC)/%.cpp, $(BIN)/%.o, $(SRCS))
 
 # Все цели
 all: clean dirs $(BIN)/$(EXECUTABLE) #docs
@@ -31,18 +33,18 @@ run: clean all
 $(BIN)/$(EXECUTABLE): examples/$(EXECUTABLE).cpp $(LIB)/lib$(LIBNAME).so $(LIB)/lib$(LIBNAME).a
 	$(CXX) $(CXX_FLAGS) $(INCLUDE) examples/$(EXECUTABLE).cpp -o $(BIN)/$(EXECUTABLE) $(LIBUSB_LIB) -L$(LIB) -l$(LIBNAME)
 
-# Сборка объектного файла из исходного кода
-$(BIN)/$(LIBNAME).o: $(SRC)/cdcc.cpp
-	$(CXX) $(CXX_FLAGS) $(INCLUDE) -c -o $(BIN)/$(LIBNAME).o $(SRC)/$(LIBNAME).cpp 
+# Сборка объектных файлов из исходного кода
+$(BIN)/%.o: $(SRC)/%.cpp
+	$(CXX) $(CXX_FLAGS) $(INCLUDE) -c -o $@ $<
 
 # Сборка динамической библиотеки (.so)
-$(LIB)/lib$(LIBNAME).so: $(BIN)/$(LIBNAME).o
-	$(CXX) -shared -o $(LIB)/lib$(LIBNAME).so $(BIN)/$(LIBNAME).o $(LIBUSB_LIB)
+$(LIB)/lib$(LIBNAME).so: $(OBJS)
+	$(CXX) -shared -o $(LIB)/lib$(LIBNAME).so $(OBJS) $(LIBUSB_LIB)
 	cp $(LIB)/lib$(LIBNAME).so .
 
 # Сборка статической библиотеки (.a)
-$(LIB)/lib$(LIBNAME).a: $(BIN)/$(LIBNAME).o
-	ar rcs $(LIB)/lib$(LIBNAME).a $(BIN)/$(LIBNAME).o
+$(LIB)/lib$(LIBNAME).a: $(OBJS)
+	ar rcs $(LIB)/lib$(LIBNAME).a $(OBJS)
 	cp $(LIB)/lib$(LIBNAME).a .
 
 # Генерация документации

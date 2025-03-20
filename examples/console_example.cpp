@@ -4,6 +4,7 @@
 
 int main()
 {
+    CDCC_CH34x dev1;
     int error = 0;
     int len = 0;
     unsigned char buf[65];
