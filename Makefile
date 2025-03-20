@@ -33,7 +33,7 @@ $(BIN)/$(EXECUTABLE): examples/$(EXECUTABLE).cpp $(LIB)/lib$(LIBNAME).so $(LIB)/
 
 # Сборка объектного файла из исходного кода
 $(BIN)/$(LIBNAME).o: $(SRC)/cdcc.cpp
-	$(CXX) $(CXX_FLAGS) $(INCLUDE) -c -o $(BIN)/$(LIBNAME).o $(SRC)/$(LIBNAME).cpp
+	$(CXX) $(CXX_FLAGS) $(INCLUDE) -c -o $(BIN)/$(LIBNAME).o $(SRC)/$(LIBNAME).cpp 
 
 # Сборка динамической библиотеки (.so)
 $(LIB)/lib$(LIBNAME).so: $(BIN)/$(LIBNAME).o

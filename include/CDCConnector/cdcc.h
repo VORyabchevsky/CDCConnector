@@ -1,8 +1,8 @@
 #ifndef CDCC
 #define CDCC
+#include "variants.h"
 #include <iostream>
 #include <vector>
-#include "variants.h"
 #include <../libusb/libusb.h>  // Внешняя библиотека libusb
 
 /*!

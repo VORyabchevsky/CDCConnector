@@ -1,7 +1,6 @@
 #include <iostream>
 #include <vector>
 #include "CDCConnector/cdcc.h"  // Заголовочный файл для класса CDCConnector
-#include <libusb-1.0/libusb.h>  // Внешняя библиотека libusb
 
 #define ACM_CTRL_DTR 0x01
 #define ACM_CTRL_RTS 0x02
