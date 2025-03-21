@@ -5,5 +5,7 @@
 #include "../libusb/libusb.h"
 #include "CDCConnector/cdcc.h"
 #include "CDCConnector/ch34x.h"
+#include "CDCConnector/pl230x.h"
+#include "CDCConnector/cp210x.h"
 #include "CDCConnector/variants.h"
-#endif 
+#endif
