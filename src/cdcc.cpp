@@ -28,79 +28,15 @@ CDCConnector::~CDCConnector()
     libusb_exit(m_ctx);
 }
 
-/*!
- *  Конвертор скоростей из uint32 в массив байт
- *
- * \return 0 в случае успеха и -EINVAL если указанная скорость вне диапазона или код ошибки для libusb_error_name()
- */
-int CDCConnector::setBaudrateToPL()
-{
-    uint8_t error = 0;
-    uint32_t baud = m_baudrate;
-    uint8_t encoding[8] = {0};
-
-    if (!(110 < baud && baud < 1000000))
-    {
-
-        std::cout << "ERROR!" << std::endl;
-        return -EINVAL;
-    }
-    for (uint8_t pos = 0; pos < 4; pos++)
-    {
-        encoding[pos] = baud & 0xFF;
-        baud = baud >> 8;
-    }
-    std::cout << "STILL OK!" << std::endl;
-    encoding[7] = 0x07;
-    error = libusb_control_transfer(m_husb, 0x21, 0x20, 0, 0, encoding, sizeof(encoding), 100);
-    IS_ERROR;
-    return 0;
-}
-
 int CDCConnector::setBaudrate(uint32_t baud)
 {
     m_baudrate = baud;
     return 0;
 }
 
-int CDCConnector::applyBaudrate()
-{
-    int error = 0;
-    if (m_husb != 0)
-    {
-        libusb_release_interface(m_husb, 0);
-
-        if (m_device.setupVarian == 0)
-        { // Profilic, SiliconLabs (CP), FT232
-            return setBaudrateToPL();
-        }
-        return error;
-    }
-    return 0;
-}
-
 int CDCConnector::connect()
 {
-    int error = 0;
-    // Подготовка интерфейса
-    m_husb = libusb_open_device_with_vid_pid(m_ctx, m_device.vid, m_device.pid);
-    if (!m_husb)
-    {
-        return LIBUSB_ERROR_NO_DEVICE;
-    }
-
-    error = libusb_claim_interface(m_husb, 0);
-    IS_ERROR;
-
-    // Настройка микросхемы и скоростей
-    if (m_device.setupVarian == 0)
-    { // Profilic, SiliconLabs (CP), FT232
-        error = libusb_control_transfer(m_husb, 0x21, 0x22, ACM_CTRL_DTR | ACM_CTRL_RTS, 0, NULL, 0, 0);
-        error = libusb_control_transfer(m_husb, 0x40, 0x01, 0x02, 0x44, NULL, 0, 0);
-        IS_ERROR;
-        return setBaudrateToPL();
-    }
-    return error;
+    return -1; ///< Заглушка
 }
 
 void CDCConnector::disconnect()

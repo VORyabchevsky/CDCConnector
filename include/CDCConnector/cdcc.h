@@ -57,14 +57,10 @@ public:
     virtual void disconnect();
     /*!
      * Функция для записи необходимй скорости. Применяется во время connect
-     */
-    virtual int setBaudrate(uint32_t baud);
-    /*!
-     * Функция применения скорости работы интерфейса
      *
      * \result возвращает код ошибки (для libusb_error_name()) или 0 в случае успешного выполнения
      */
-    virtual int applyBaudrate();
+    virtual int setBaudrate(uint32_t baud);
 
     /*!
      *  Чтение данных из последовательного интерфейса. Обращается за данными к bulkReadEndpoint
@@ -112,8 +108,6 @@ protected:
     libusb_device_handle *m_husb; ///< дескриптор USB устройства
     libusb_context *m_ctx = NULL; ///< контекст для libusb
     uint32_t m_baudrate = 115200; ///< скорость обмена информацией по UART
-
-    int setBaudrateToPL();
 };
 
 #endif
