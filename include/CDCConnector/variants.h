@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-#define CH340 cdcVariants[0]
+// #define CH340 cdcVariants[0]
 /*!
  * Структура с полями необходимыми для описания подлючаемого CDC устройства
  */
@@ -21,6 +21,6 @@ struct CDCDEV
 };
 
 inline CDCDEV cdcVariants[3] = {
-    {0x1a86, 0x7523, "CH340", "Generic CH34x device", 0x82, 0x02, 1},
-    {0x067b, 0x2303, "PL2303", "Prolific Technology, Inc. USB-Serial Controller", 0x83, 0x02},
-    {0x10c4, 0xea60, "CP2102", "Generic CP2102 device", 0x81, 0x01, 3}};
+    {0x1a86, 0x7523, "CH340", "Generic CH34x device", 0x82, 0x02, 0},
+    {0x067b, 0x2303, "PL2303", "Prolific Technology, Inc. USB-Serial Controller", 0x83, 0x02, 1},
+    {0x10c4, 0xea60, "CP2102", "Generic CP2102 device", 0x81, 0x01, 2}};

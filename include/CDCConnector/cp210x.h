@@ -7,7 +7,7 @@ class CDCC_CP210x : public CDCConnector
 {
 public:
     // На основе https://github.com/torvalds/linux/blob/master/drivers/usb/serial/cp210x.c
-    // CDCC_CP210x();
+    CDCC_CP210x(CDCDEV variant);
     int connect();
 
     /* Из документации:

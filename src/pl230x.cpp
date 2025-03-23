@@ -1,8 +1,11 @@
 #include "CDCConnector/pl230x.h"
 
-CDCC_PL230x::CDCC_PL230x()
+CDCC_PL230x::CDCC_PL230x(CDCDEV variant)
 {
-    std::cout << "CDCC_PL230x created!" << std::endl;
+    m_device = variant;
+    libusb_init(&m_ctx);
+    libusb_set_option(m_ctx, LIBUSB_OPTION_LOG_LEVEL, 1); // уровень вывода ошибок libusb: warning [darwin_transfer_status] transfer error: timed out, https://libusb.sourceforge.io/api-1.0/group__libusb__lib.html#ga2d6144203f0fc6d373677f6e2e89d2d2
+    m_husb = 0;
 }
 
 int CDCC_PL230x::connect()

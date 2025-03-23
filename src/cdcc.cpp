@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include "CDCConnector.h"
 #include "CDCConnector/cdcc.h"
 
 CDCConnector::CDCConnector(CDCDEV variant)
@@ -15,11 +16,6 @@ CDCConnector::CDCConnector()
     libusb_init(&m_ctx);
     libusb_set_option(m_ctx, LIBUSB_OPTION_LOG_LEVEL, 1); // уровень вывода ошибок libusb: warning [darwin_transfer_status] transfer error: timed out, https://libusb.sourceforge.io/api-1.0/group__libusb__lib.html#ga2d6144203f0fc6d373677f6e2e89d2d2
     m_husb = 0;
-}
-
-void CDCConnector::resetVariant(CDCDEV variant)
-{
-    m_device = variant;
 }
 
 CDCConnector::~CDCConnector()
@@ -182,4 +178,27 @@ int CDCConnector::firstCDC(CDCDEV *first)
         return 1;
     }
     return result;
+}
+
+CDCConnector *CDCConnector::createDevice(uint16_t vid, uint16_t pid)
+{
+    for (CDCDEV variant : cdcVariants)
+    {
+        if (variant.vid == vid && variant.pid == pid)
+        {
+            switch (variant.setupVarian)
+            {
+            case 0: // CH34x
+                return new CDCC_CH34x(variant);
+            case 1: // PL230x
+                return new CDCC_PL230x(variant);
+            case 3: // CP210x
+                return new CDCC_CP210x(variant);
+            default: // По умолчанию используем базовый класс
+                return new CDCConnector();
+            }
+        }
+    }
+    // Если устройство не найдено, возвращаем nullptr
+    return nullptr;
 }

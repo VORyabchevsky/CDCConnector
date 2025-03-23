@@ -6,13 +6,13 @@
 #define DIV_ROUND_CLOSEST(x, divisor) \
     (((x) + ((divisor) / 2)) / (divisor))
 
-// CDCC_CP210x::CDCC_CP210x()
-// {
-//     libusb_init(&m_ctx);
-//     libusb_set_option(m_ctx, LIBUSB_OPTION_LOG_LEVEL, 1); // уровень вывода ошибок libusb: warning [darwin_transfer_status] transfer error: timed out, https://libusb.sourceforge.io/api-1.0/group__libusb__lib.html#ga2d6144203f0fc6d373677f6e2e89d2d2
-//     m_husb = 0;
-//     std::cout << "CDCC_CP210x created!" << std::endl;
-// }
+CDCC_CP210x::CDCC_CP210x(CDCDEV variant)
+{
+    m_device = variant;
+    libusb_init(&m_ctx);
+    libusb_set_option(m_ctx, LIBUSB_OPTION_LOG_LEVEL, 1); // уровень вывода ошибок libusb: warning [darwin_transfer_status] transfer error: timed out, https://libusb.sourceforge.io/api-1.0/group__libusb__lib.html#ga2d6144203f0fc6d373677f6e2e89d2d2
+    m_husb = 0;
+}
 
 int CDCC_CP210x::connect()
 {
@@ -56,6 +56,6 @@ int CDCC_CP210x::setBaudrate(uint32_t baud)
             (unsigned char *)&baud, sizeof(baud), 100);
 
         IS_ERROR;
-        return 0;
     }
+    return 0;
 }

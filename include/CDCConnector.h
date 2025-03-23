@@ -7,5 +7,6 @@
 #include "CDCConnector/ch34x.h"
 #include "CDCConnector/pl230x.h"
 #include "CDCConnector/cp210x.h"
+#include "CDCConnector/cdcacm.h"
 #include "CDCConnector/variants.h"
 #endif

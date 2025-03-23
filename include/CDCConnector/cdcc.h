@@ -42,10 +42,6 @@ public:
     ~CDCConnector();
 
     /*!
-     * Переназначает вариант микросхемы
-     */
-    virtual void resetVariant(CDCDEV variant);
-    /*!
      * Функция подготовки микросхемы к работе. Выполняет открытие интерфейса, подготовку и передачу скорости UART (baudrate) для обмена данными
      *
      * \result возвращает код ошибки (для libusb_error_name()) или 0 в случае успешного выполнения
@@ -102,6 +98,7 @@ public:
      * \return 1 если найдено устройство, 0 если нету или код ошибки
      */
     static int firstCDC(CDCDEV *first);
+    static CDCConnector *createDevice(uint16_t vid, uint16_t pid);
 
 protected:
     CDCDEV m_device;              ///< переменная, содержащая всю информацию о подключаемом устройстве

@@ -7,7 +7,7 @@ class CDCC_PL230x : public CDCConnector
 {
 public:
     // Конструктор
-    CDCC_PL230x();
+    CDCC_PL230x(CDCDEV variant);
     int connect();
     /*!
      *  Конвертор скоростей из uint32 в массив байт

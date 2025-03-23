@@ -7,7 +7,7 @@ class CDCC_CH34x : public CDCConnector
 {
 public:
     // Конструктор
-    CDCC_CH34x();
+    CDCC_CH34x(CDCDEV variant);
     int connect();
     /*!
      *  Конвертор скоростей из uint32 в значения регистров для CH340 (и подобных). Содержит магическое число CH341_BAUDBASE_FACTOR = 1532620800.
