@@ -194,11 +194,10 @@ CDCConnector *CDCConnector::createDevice(uint16_t vid, uint16_t pid)
                 return new CDCC_PL230x(variant);
             case 3: // CP210x
                 return new CDCC_CP210x(variant);
-            default: // По умолчанию используем базовый класс
-                return new CDCConnector();
+            default:
+                return nullptr;
             }
         }
     }
-    // Если устройство не найдено, возвращаем nullptr
     return nullptr;
 }

@@ -35,7 +35,6 @@ int CDCC_CP210x::connect()
 
 int CDCC_CP210x::setBaudrate(uint32_t baud)
 {
-    std::cout << "HERE!" << std::endl;
     int error = 0;
     unsigned int prescale = 1;
     unsigned int div;
