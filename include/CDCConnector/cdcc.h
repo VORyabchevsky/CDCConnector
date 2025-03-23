@@ -98,6 +98,32 @@ public:
      * \return 1 если найдено устройство, 0 если нету или код ошибки
      */
     static int firstCDC(CDCDEV *first);
+
+    /*!
+     * Фабричный метод, который определяет тип устройства по его Vendor ID (VID) и Product ID (PID)
+     * и создает соответствующий экземпляр дочернего класса, наследующего от CDCConnector.
+     * Если устройство не поддерживается, возвращается nullptr.
+     *
+     * \param[in] vid Vendor ID устройства (идентификатор производителя).
+     * \param[in] pid Product ID устройства (идентификатор продукта).
+     * \return Указатель на объект класса CDCConnector, представляющий устройство.
+     *         Если устройство с указанными VID и PID не найдено или не поддерживается, возвращается nullptr.
+     *
+     * Пример использования:
+     * \code
+     * uint16_t vid = 0x1A86; // VID для CH340
+     * uint16_t pid = 0x7523; // PID для CH340
+     * CDCConnector* device = CDCConnector::createDevice(vid, pid);
+     * if (device) {
+     *     device->connect();
+     *     // magic!
+     *     delete device;
+     * }
+     * \endcode
+     *
+     * \warning Если метод возвращает nullptr, это означает, что устройство не поддерживается
+     *          или произошла ошибка при создании объекта.
+     */
     static CDCConnector *createDevice(uint16_t vid, uint16_t pid);
 
 protected:
