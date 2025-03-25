@@ -4,11 +4,11 @@
 
 int main()
 {
-    CDCC_CH34x dev1;
     int error = 0;
     int len = 0;
     unsigned char buf[65];
-    unsigned char testMessage[20] = "Hello World!!\n\r";
+    // unsigned char testMessage[20] = "Hello World!!\n\r";
+    unsigned char testMessage[8] = {0x10, 0x10, 0x0, 0x0, 0xe8, 0x03, 0x49, 0xcd};
     std::vector<CDCDEV> list;
 
     int x = CDCConnector::lsUSB(&list);
@@ -24,20 +24,21 @@ int main()
         return 1;
     }
 
-    CDCConnector dev(variant);
-    dev.setBaudrate(9600);
-    res = dev.connect();
+    // CDCConnector dev(variant);
+    CDCConnector *dev = CDCConnector::createDevice(variant.vid, variant.pid);
+    dev->setBaudrate(9600);
+    res = dev->connect();
     std::cout << libusb_error_name(res) << std::endl;
 
     while (1)
     {
-        error = dev.sendBytes(testMessage, sizeof(testMessage) / sizeof(testMessage[0])); ///< Отправка пакета в UART
+        error = dev->sendBytes(testMessage, 8); // sizeof(testMessage) / sizeof(testMessage[0])); ///< Отправка пакета в UART
         if (error != 0)
         {
             std::cout << error << std::endl;
             std::cout << libusb_error_name(error) << std::endl;
         }
-        len = dev.readBytes(buf, 64, 100); ///< Чтение ответного сообщения из UART
+        len = dev->readBytes(buf, 64, 100); ///< Чтение ответного сообщения из UART
         if (len > 0)
         {
             buf[len] = 0;

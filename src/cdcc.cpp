@@ -192,7 +192,7 @@ CDCConnector *CDCConnector::createDevice(uint16_t vid, uint16_t pid)
                 return new CDCC_CH34x(variant);
             case 1: // PL230x
                 return new CDCC_PL230x(variant);
-            case 3: // CP210x
+            case 2: // CP210x
                 return new CDCC_CP210x(variant);
             default:
                 return nullptr;
