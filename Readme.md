@@ -39,14 +39,21 @@ mv tmp/libusb . && rm -rf tmp
 - `make libcdcc.so` - создает файл динамической библиотеки
 - `make libcdcc.a` - создает файл статической библиотеки
 
-. Для АврораОС использовал команды:
+### Аврора ОС
+
+Сборка осуществляется через PSDK. Для этого необходимо настроить его в соответсвии со [статьей](https://habr.com/ru/articles/886192/). Далее доустановить пакеты (для каждого таргета):
 
 ```
-export $AURORA_TAG=AuroraOS-5.1.3.85-MB2-aarch64.default
-sfdk engine exec sb2 -t $AURORA_TAG make libcdcc.so
-```
+export TARGET_ARMV7HL=AuroraOS-5.1.3.85-MB2-armv7hl
+export TARGET_AARCH64=AuroraOS-5.1.3.85-MB2-aarch64
 
-_примечание: sfdk добавлено в PATH. AURORA_TAG указать в соответсвии с используемой платформой_
+#по необходимости - установить таргеты
+sdk-chroot sdk-assistant target create $TARGET_ARMV7HL Aurora_OS-5.1.3.85-MB2-Aurora_SDK_Target-armv7hl.tar.7z
+sdk-chroot sdk-assistant target create $TARGET_AARCH64 Aurora_OS-5.1.3.85-MB2-Aurora_SDK_Target-aarch64.tar.7z
+
+sdk-chroot sb2 -R -t $TARGET_ARMV7HL zypper in doxygen libusb1-devel
+sdk-chroot sb2 -R -t $TARGET_AARCH64 zypper in doxygen libusb1-devel
+```
 
 ## TODO
 
@@ -54,6 +61,7 @@ _примечание: sfdk добавлено в PATH. AURORA_TAG указат�
 
 - [ ] функции для работы с сигналами rts, dtr и др.
 - [ ] проверить и докрутить работу с другими микросхемами (cp210x, ft232)
+- [ ] ci, (_возможно перенесу на gitverse_)
 
 ## Примеры
 

@@ -4,5 +4,6 @@ libcdcc.so
 libcdcc.a
 libusb-1.0.so
 libusb
+lib/
 build/
-docs
+docs/
