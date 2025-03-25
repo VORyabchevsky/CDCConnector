@@ -55,13 +55,26 @@ sdk-chroot sb2 -R -t $TARGET_ARMV7HL zypper in doxygen libusb1-devel
 sdk-chroot sb2 -R -t $TARGET_AARCH64 zypper in doxygen libusb1-devel
 ```
 
+### CI
+
+Добавить репозиторий в "компании", к которой привязаны ранеры:
+
+```
+git remote add cirepo git@gitflic.ru:...
+```
+
+Далее запушить изменения:
+
+```
+git push cirepo
+```
+
 ## TODO
 
 Текущая версия - минимальный прототип для обмена сообщениями. В планах:
 
 - [ ] функции для работы с сигналами rts, dtr и др.
 - [ ] проверить и докрутить работу с другими микросхемами (cp210x, ft232)
-- [ ] ci, (_возможно перенесу на gitverse_)
 
 ## Примеры
 

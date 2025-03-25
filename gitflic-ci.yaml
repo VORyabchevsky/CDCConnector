@@ -1,0 +1,66 @@
+.template-build:
+  script:
+    - mkdir -p libusb
+    - curl -o libusb/libusb.h https://raw.githubusercontent.com/libusb/libusb/refs/heads/master/libusb/libusb.h
+    - $PSDK_PATH/sdk-chroot sb2 -R -t $TARGET make clean dirs lib/libcdcc.a
+    - mv lib $TARGET
+  tags:
+    - psdk
+  cache:
+    key:
+      - tmp
+    paths:
+      - $TARGET/
+
+stages:
+  - build
+  - docs
+  - archive
+
+build-armv7hl:
+  stage: build
+  variables:
+    TARGET: $TARGET_ARMV7HL
+  extends: .template-build
+
+build-aarch64:
+  stage: build
+  variables:
+    TARGET: $TARGET_AARCH64
+  extends: .template-build
+
+make-docs:
+  stage: docs
+  script:
+    - $PSDK_PATH/sdk-chroot make doc
+  cache:
+    key:
+      - tmp
+    paths:
+      - docs/
+
+  tags:
+    - psdk
+
+create-archive:
+  stage: archive
+  script:
+    - echo "Создание архива с результатами"
+    - mkdir final
+    - cp -r docs final/
+    - cp -r $TARGET_ARMV7HL final/
+    - cp -r $TARGET_AARCH64 final/
+    - tar -czvf results.tar.gz final/
+  artifacts:
+    paths:
+      - results.tar.gz
+    expire_in: 1 hour
+  needs:
+    - build-armv7hl
+    - build-aarch64
+    - make-docs
+  tags:
+    - psdk
+  cache:
+    key:
+      - tmp
